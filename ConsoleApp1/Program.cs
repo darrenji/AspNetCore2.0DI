@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using System;
+using System.IO;
 using System.Linq;
 
 namespace ConsoleApp1
@@ -15,19 +17,16 @@ namespace ConsoleApp1
 
         private static void Demo()
         {
+            var configuration = new ConfigurationBuilder()
+                 .AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json"))
+                 .Build();
+
             IServiceCollection services = new ServiceCollection();
-
-            //条件2： 在容器中要允许IOptions的登场
             services.AddOptions();
-            services.AddTransient<MyTaxCalculator>();
-
-            //条件3：使用Configure方法动态设置实例
-            services.Configure<MyTaxCalculatorOptions>(options =>
-            {
-                options.TaxRatio = 135;
-            });
-            var seriviceProvider = services.BuildServiceProvider();
-            var calculator = seriviceProvider.GetService<MyTaxCalculator>();
+            services.AddScoped<MyTaxCalculator>();
+            services.Configure<MyTaxCalculatorOptions>(configuration.GetSection("TaxOptions"));
+            var serivceProvider = services.BuildServiceProvider();
+            var calculator = serivceProvider.GetRequiredService<MyTaxCalculator>();
             Console.WriteLine(calculator.Calculate(100));
         }
     }
