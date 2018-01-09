@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
 
 namespace ConsoleApp1
 {
@@ -7,32 +8,56 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-          
+            MultipleImplementation();
         }
 
-        private static void Demo()
+        private static void MultipleImplementation()
         {
             IServiceCollection services = new ServiceCollection();
-            services.AddTransient(typeof(IMyGeneric<Special>), typeof(MyGeneric<Special>));
+            services.AddTransient<IHasValue, MyClassWithValue>();
+            services.AddTransient<IHasValue, MyClassWithValue2>();
             var serviceProvider = services.BuildServiceProvider();
-            var service = serviceProvider.GetService<IMyGeneric<Special>>();
+
+            //从容器从拿到所有服务
+            var myServices = serviceProvider.GetServices<IHasValue>().ToList();
+            var myService = serviceProvider.GetService<IHasValue>();
+
+            Console.WriteLine("来看看所有的服务");
+            foreach(var service in myServices)
+            {
+                Console.WriteLine(service.Value);
+            }
+
+            Console.WriteLine("来看默认的服务");
+            Console.WriteLine(myService.Value);
         }
 
     }
 
-    public interface IMyGeneric<T> where T : class
+    public interface IHasValue
     {
+        object Value { get; set; }
 
     }
 
-    public class MyGeneric<T> : IMyGeneric<T> where T : class
+    public class MyClassWithValue : IHasValue
     {
+        public object Value { get; set; }
 
+        public MyClassWithValue()
+        {
+            Value = 42;
+        }
     }
 
-    public class Special
+    public class MyClassWithValue2 : IHasValue
     {
+        public object Value { get; set; }
 
+        public MyClassWithValue2()
+        {
+            Value = 43;
+        }
     }
 
 }
