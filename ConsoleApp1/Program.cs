@@ -7,17 +7,35 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            IServiceCollection services = new ServiceCollection();
+            Demo();
+        }
 
-            //Transient:service每次被请求就创建一个实例
-            //Scoped:为每个请求创建一个service实例
-            //Singleton:所有的请求用一个service实例
-            services.AddTransient<MyService>();
+        private static void Demo()
+        {
+            IServiceCollection services = new ServiceCollection();
+            services.AddTransient<TransientDateOperation>();
+            services.AddScoped<ScopedDateOperation>();
+            services.AddSingleton<SingletonDateOperation>();
             var serviceProvider = services.BuildServiceProvider();
 
-            //这里的IServiceProvider看做是DI容器
-            var myService = serviceProvider.GetService<MyService>();
-            myService.DoSth();
+            Console.WriteLine();
+            Console.WriteLine("-----first request----");
+            Console.WriteLine();
+            var transientService = serviceProvider.GetService<TransientDateOperation>();
+            var scopedServce = serviceProvider.GetService<ScopedDateOperation>();
+            var singletonService = serviceProvider.GetService<SingletonDateOperation>();
+
+            Console.WriteLine();
+            Console.WriteLine("-----second request----");
+            Console.WriteLine();
+            var transientService2 = serviceProvider.GetService<TransientDateOperation>();
+            var scopedService2 = serviceProvider.GetService<ScopedDateOperation>();
+            var singletonService2 = serviceProvider.GetService<SingletonDateOperation>();
+
+            Console.WriteLine();
+            Console.WriteLine("---------");
+            Console.WriteLine();
+
         }
     }
 
@@ -28,4 +46,30 @@ namespace ConsoleApp1
             Console.WriteLine("doing sth...");
         }
     }
+
+    public class TransientDateOperation
+    {
+        public TransientDateOperation()
+        {
+            Console.WriteLine("Transient service is created");
+        }
+    }
+
+    public class ScopedDateOperation
+    {
+        public ScopedDateOperation()
+        {
+            Console.WriteLine("Scoped service is created");
+        }
+    }
+
+    public class SingletonDateOperation
+    {
+        public SingletonDateOperation()
+        {
+            Console.WriteLine("Singleton service is created");
+        }
+    }
+
+   
 }
