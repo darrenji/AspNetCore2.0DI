@@ -7,7 +7,7 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            Demo();
+            Demo2();
         }
 
         private static void Demo()
@@ -36,6 +36,39 @@ namespace ConsoleApp1
             Console.WriteLine("---------");
             Console.WriteLine();
 
+        }
+
+        private static void Demo2()
+        {
+            IServiceCollection services = new ServiceCollection();
+            services.AddTransient<TransientDateOperation>();
+            services.AddScoped<ScopedDateOperation>();
+            services.AddSingleton<SingletonDateOperation>();
+            var serviceProvider = services.BuildServiceProvider();
+
+            Console.WriteLine();
+            Console.WriteLine("-----first request----");
+            Console.WriteLine();
+            using(var scope = serviceProvider.CreateScope())
+            {
+                var transientService = scope.ServiceProvider.GetService<TransientDateOperation>();
+                var scopedService = scope.ServiceProvider.GetService<ScopedDateOperation>();
+                var singletonService = scope.ServiceProvider.GetService<SingletonDateOperation>();
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("-----second request----");
+            Console.WriteLine();
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var transientService = scope.ServiceProvider.GetService<TransientDateOperation>();
+                var scopedService = scope.ServiceProvider.GetService<ScopedDateOperation>();
+                var singletonService = scope.ServiceProvider.GetService<SingletonDateOperation>();
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("---------");
+            Console.WriteLine();
         }
     }
 
