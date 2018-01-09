@@ -16,11 +16,9 @@ namespace ConsoleApp1
         {
             IServiceCollection services = new ServiceCollection();
             services.AddTransient<IHasValue, MyClassWithValue>();
-            services.TryAddTransient<IHasValue, MyClassWithValue2>();
-            var serviceProvider = services.BuildServiceProvider();
-            var myServices = serviceProvider.GetServices<IHasValue>().ToList();
-
-            Console.WriteLine("来看所有的服务");
+            services.Replace(ServiceDescriptor.Transient<IHasValue, MyClassWithValue2>());
+            var seriviceProvider = services.BuildServiceProvider();
+            var myServices = seriviceProvider.GetServices<IHasValue>();
             foreach(var service in myServices)
             {
                 Console.WriteLine(service.Value);
