@@ -28,6 +28,7 @@ namespace ConsoleApp1
             var serivceProvider = services.BuildServiceProvider();
             var calculator = serivceProvider.GetRequiredService<MyTaxCalculator>();
             Console.WriteLine(calculator.Calculate(100));
+            Console.WriteLine(configuration["TaxOptions:TaxRatio"]);
         }
     }
 
